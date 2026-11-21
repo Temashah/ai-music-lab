@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Music Lab — Создай свой трек</title>
+    <style>
+        /* --- СБРОС И БАЗА --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: #050508; 
+            color: #fff; 
+            line-height: 1.6; 
+            overflow-x: hidden;
+            cursor: default; /* Убираем стандартный курсор, чтобы свой смотрелся лучше */
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        /* --- АНИМАЦИИ --- */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(0, 229, 160, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 229, 160, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 229, 160, 0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* --- ПАРАЛЛАКС ФОН (ВАРИАНТ 2) --- */
+        .parallax-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 0%, #1a0b3e 0%, #050508 100%);
+            overflow: hidden;
+        }
+        .parallax-dot {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(20px);
+            opacity: 0.6;
+            animation: float infinite alternate;
+        }
+        .dot-1 { width: 150px; height: 150px; background: #7b2ff7; top: 10%; left: 10%; animation-duration: 8s; }
+        .dot-2 { width: 200px; height: 200px; background: #ff0055; bottom: 20%; right: 10%; animation-duration: 12s; animation-delay: -2s; }
+        .dot-3 { width: 100px; height: 100px; background: #00e5a0; top: 50%; left: 80%; animation-duration: 6s; animation-delay: -4s; }
+
+        /* --- ХЕДЕР --- */
+        header { 
+            padding: 20px 0; 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+            background: rgba(5, 5, 8, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 100;
+        }
+        header .container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { 
+            font-weight: 800; font-size: 1.5rem; letter-spacing: 2px;
+            background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; color: transparent;
+            text-transform: uppercase;
+        }
+        nav a { color: #888; text-decoration: none; margin-left: 20px; font-weight: 500; transition: 0.3s; }
+        nav a:hover { color: #fff; }
+
+        /* --- ГЛАВНЫЙ ЭКРАН (HERO) --- */
+        #hero { 
+            min-height: 100vh; 
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 { font-size: 3.5rem; margin-bottom: 20px; line-height: 1.1; }
+        h1 span { color: #00e5a0; }
+        
+        #hero p { max-width: 600px; margin: 0 auto 40px; color: #aaa; font-size: 1.1rem; }
+        
+        form { 
+            max-width: 600px; margin: 0 auto; 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(10px);
+            padding: 30px; 
+            border-radius: 24px; 
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        input[type="text"] { 
+            width: 100%; 
+            padding: 20px; 
+            font-size: 18px; 
+            border-radius: 16px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            background: rgba(0,0,0,0.3); 
+            color: #fff; 
+            outline: none;
+            transition: 0.3s;
+        }
+        input[type="text"]:focus { border-color: #7b2ff7; box-shadow: 0 0 15px rgba(123, 47, 247, 0.3); }
+
+        .btn { 
+            width: 100%; 
+            padding: 18px; 
+            font-size: 18px; 
+            font-weight: 700; 
+            color: white; 
+            border: none; 
+            border-radius: 16px; 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-primary { 
+            background: linear-gradient(135deg, #7b2ff7, #ff0055); 
+            box-shadow: 0 10px 30px rgba(123, 47, 247, 0.4);
+        }
+        .btn-primary:hover { transform: scale(1.02); box-shadow: 0 15px 40px rgba(123, 47, 247, 0.6); }
+        .btn-ghost { 
+            background: transparent; 
+            border: 1px solid rgba(255,255,255,0.2); 
+            color: #fff;
+        }
+        .btn-ghost:hover { border-color: #fff; background: rgba(255,255,255,0.05); }
+
+        .progress-container { 
+            width: 100%; height: 12px; 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 6px; 
+            margin-top: 20px; 
+            display: none; 
+            overflow: hidden;
+        }
+        .progress-bar { 
+            width: 0%; height: 100%; 
+            background: linear-gradient(90deg, #7b2ff7, #00e5a0); 
+            transition: width 0.2s;
+        }
+        #progress-label { 
+            margin-top: 10px; color: #888; font-size: 0.9rem; 
+            text-align: center;
+        }
+
+        #result { 
+            display: none; 
+            margin-top: 30px;
+            background: rgba(20, 20, 30, 0.6);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        #result audio { width: 100%; margin: 20px 0; }
+
+        .note { 
+            margin-top: 30px; 
+            color: #00e5a0; 
+            font-weight: bold; 
+            font-size: 1.1rem;
+            background: rgba(0, 229, 160, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        /* --- БЛОК "КАК ЭТО РАБОТАЕТ" (ВАРИАНТ 1) --- */
+        .how-it-works {
+            padding: 80px 0;
+            background: rgba(0,0,0,0.2);
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #7b2ff7, #00e5a0);
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        .step-card {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+            opacity: 0; /* Для анимации появления */
+            transform: translateY(30px);
+        }
+        .step-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .step-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .step-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        .step-desc {
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        /* --- ТАРИФЫ --- */
+        section { padding: 80px 0; }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 30px; 
+        }
+        .card { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 30px; 
+            border-radius: 20px; 
+            text-align: center; 
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, #7b2ff7, #ff0055);
+            opacity: 0; transition: 0.3s;
+        }
+        .card:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.06); }
+        .card:hover::before { opacity: 1; }
+        
+        .price-old { text-decoration: line-through; color: #666; font-size: 1.1rem; }
+        .price-new { color: #00e5a0; font-weight: 800; font-size: 2.2rem; display: block; margin-top: 5px; }
+        
+        .badge { 
+            display: inline-block; 
+            background: rgba(123, 47, 247, 0.2); 
+            color: #7b2ff7; 
+            padding: 4px 12px; 
+            border-radius: 20px; 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            margin-bottom: 15px;
+        }
+
+        /* --- ПРИМЕРЫ РАБОТ --- */
+        .example-cover { 
+            height: 180px; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; font-size: 1.2rem;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* --- МОДАЛЬНОЕ ОКНО ОПЛАТЫ --- */
+        .modal-overlay { 
+    display: flex; 
+    position: fixed; 
+    inset: 0; 
+    background: rgba(0,0,0,0.85); 
+    backdrop-filter: blur(10px);
+    z-index: 1000; 
+    align-items: center; 
+    justify-content: center; 
+    opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s;
+}
+.modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+
+        
+        .modal { 
+            background: rgba(20, 20, 30, 0.95); 
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 24px; 
+            padding: 40px; 
+            max-width: 450px; 
+            width: 90%; 
+            text-align: center; 
+            position: relative; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: scale(0.95); transition: 0.3s;
+        }
+        .modal-overlay.active .modal { transform: scale(1); }
+        
+        .close { 
+            position: absolute; top: 15px; right: 20px; 
+            background: none; border: none; color: #888; 
+            font-size: 24px; cursor: pointer;
+        }
+        .close:hover { color: #fff; }
+        
+        .modal h3 { margin-bottom: 10px; }
+        .modal .old { font-size: 1.1rem; color: #666; text-decoration: line-through; }
+        .modal .new { font-size: 3rem; font-weight: 800; color: #00e5a0; margin: 5px 0; }
+        .modal .badge { margin-top: 10px; }
+        
+        .pay-methods { display: flex; gap: 10px; justify-content: center; margin: 20px 0; color: #aaa; font-size: 0.9rem; }
+        .pay-methods span { background: rgba(255,255,255,0.05); padding: 8px 16px; border-radius: 8px; }
+        
+        .secure-note { font-size: 0.75rem; color: #555; margin-top: 15px; }
+
+        /* --- FOOTER --- */
+        footer { background: #000; color: #555; padding: 40px 0; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
+        
+        /* --- АНИМАЦИЯ ПОЯВЛЕНИЯ БЛОКОВ --- */
+        .fade-in { opacity: 0; transform: translateY(20px); transition: all 0.8s ease-out; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    </style>
+</head>
+<body>
+
+    <!-- ПАРАЛЛАКС ФОН -->
+    <div class="parallax-bg" id="parallax-bg">
+    <div class="parallax-dot dot-1"></div>
+    <div class="parallax-dot dot-2"></div>
+    <div class="parallax-dot dot-3"></div>
+    <div class="cursor-glow"></div>
+</div>
+.cursor-glow {
+    position: absolute;
+    width: 450px; height: 450px;
+    background: radial-gradient(circle, rgba(123, 47, 247, 0.22), transparent 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    filter: blur(30px);
+    transition: left 0.4s ease-out, top 0.4s ease-out;
+}
+
+
+    <header>
+        <div class="container">
+            <div class="logo">AI Music Lab</div>
+            <nav>
+                <a href="#how-it-works">Как это работает</a>
+                <a href="#pricing">Тарифы</a>
+                <a href="#examples">Примеры</a>
+            </nav>
+        </div>
+    </header>
+
+    <section id="hero">
+        <div class="container">
+            <h1>Создай свою музыку<br>с <span>ИИ</span></h1>
+            <p>Опиши настроение, жанр и инструменты — искусственный интеллект создаст трек специально для тебя.</p>
+
+            <form id="music-form">
+                <input type="text" id="prompt-input" placeholder="Например: меланхоличный лоу-фай бит с гитарой и саксофоном..." required>
+                <button type="submit" class="btn btn-primary">Сгенерировать трек</button>
+                
+                <div class="progress-container" id="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <p id="progress-label">Нейросеть анализирует запрос...</p>
+            </form>
+
+            <div id="result">
+                <h3>Ваш трек готов! 🎧</h3>
+                <p id="result-prompt" style="color:#888; font-size:0.9rem; margin-bottom: 20px;"></p>
+                <audio id="audio-player" controls></audio>
+                <button id="download-btn" class="btn btn-primary">⬇ Скачать трек — 49 ₽</button>
+            </div>
+
+            <p class="note">⚡ Акция: обычная цена 139 ₽ — сейчас всего 49 ₽ за трек!</p>
+        </div>
+    </section>
+
+    <!-- БЛОК "КАК ЭТО РАБОТАЕТ" (ВАРИАНТ 1) -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <h2 class="section-title fade-in">Как это работает</h2>
+            <div class="steps-grid">
+                <div class="step-card fade-in">
+                    <span class="step-icon">📝</span>
+                    <h3 class="step-title">Опиши идею</h3>
+                    <p class="step-desc">Введи в поле промпт: какой жанр, настроение и инструменты ты хочешь услышать. Чем детальнее описание, тем точнее результат.</p>
+                </div>
+                <div class="step-card fade-in">
+                    <span class="step-icon">🤖</span>
+                    <h3 class="step-title">ИИ генерирует</h3>
+                    <p class="step-desc">Наш алгоритм анализирует текст и создает уникальную мелодию, подбирая аккорды и ритм под твое описание.</p>
+                </div>
+                <div class="step-card fade-in">
+                    <span class="step-icon">🎵</span>
+                    <h3 class="step-title">Скачай и слушай</h3>
+                    <p class="step-desc">Прослушай результат в плеере и скачай файл в формате WAV. Трек твой — используй где угодно!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing">
+        <div class="container">
+            <h2 class="section-title fade-in">Тарифы</h2>
+            <div class="grid">
+                <div class="card fade-in">
+                    <span class="badge">Хит</span>
+                    <h3>1 трек</h3>
+                    <p><span class="price-old">139 ₽</span> &nbsp; <span class="price-new">49 ₽</span></p>
+                    <p style="color:#aaa; margin-bottom: 20px;">Генерация за 1 минуту, формат WAV.</p>
+                    <button class="btn btn-ghost" onclick="alert('Сгенерируйте трек через форму выше')">Купить</button>
+                </div>
+                <div class="card fade-in">
+                    <h3>Пакет 5 треков</h3>
+                    <p><span class="price-old">695 ₽</span> &nbsp; <span class="price-new">220 ₽</span></p>
+                    <p style="color:#aaa; margin-bottom: 20px;">Скидка 68% + приоритетная очередь.</p>
+                    <button class="btn btn-ghost" onclick="alert('Здесь будет форма оплаты')">Купить</button>
+                </div>
+                <div class="card fade-in">
+                    <h3>Безлимит (мес)</h3>
+                    <p><span class="price-old">2 490 ₽</span> &nbsp; <span class="price-new">490 ₽</span></p>
+                    <p style="color:#aaa; margin-bottom: 20px;">Неограниченные генерации в месяц.</p>
+                    <button class="btn btn-ghost" onclick="alert('Здесь будет форма оплаты')">Купить</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="examples">
+        <div class="container">
+            <h2 class="section-title fade-in">Примеры сгенерированных треков</h2>
+            <div class="grid">
+                <div class="card fade-in">
+                    <div class="example-cover" style="background: linear-gradient(135deg, #ff0055, #ff5500);">Lo-Fi Vibes</div>
+                    <p>Расслабляющий бит для работы.</p>
+                    <button class="btn btn-ghost">Слушать</button>
+                </div>
+                <div class="card fade-in">
+                    <div class="example-cover" style="background: linear-gradient(135deg, #0000ff, #5500ff);">Cyberpunk Drive</div>
+                    <p>Энергичный синтвейв для дороги.</p>
+                    <button class="btn btn-ghost">Слушать</button>
+                </div>
+                <div class="card fade-in">
+                    <div class="example-cover" style="background: linear-gradient(135deg, #00ff88, #005533);">Piano Emotions</div>
+                    <p>Грустная фортепианная мелодия.</p>
+                    <button class="btn btn-ghost">Слушать</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- МОДАЛЬНОЕ ОКНО ОПЛАТЫ -->
+    <div class="modal-overlay" id="pay-modal">
+        <div class="modal">
+            <button class="close" onclick="closeModal()">✕</button>
+            <div id="pay-offer">
+                <h3>Оформление трека</h3>
+                <p class="old">Обычная цена: 139 ₽</p>
+                <p class="new">49 ₽</p>
+                <span class="badge">−65% по акции сегодня</span>
+                <div class="pay-methods">
+                    <span>💳 Карта</span>
+                    <span>🅿️ СБП</span>
+                    <span>📱 Сотки</span>
+                </div>
+                <button id="pay-confirm" class="btn btn-primary" style="width:100%;">Оплатить 49 ₽</button>
+                <p class="secure-note">🔒 Демо-режим: реальная оплата не списывается</p>
+            </div>
+            <div id="pay-success">
+                <div style="font-size:3rem; margin-bottom: 10px;">✅</div>
+                <h3>Оплата прошла!</h3>
+                <p>Трек уже скачивается на ваше устройство.</p>
+                <p style="font-size:0.85rem; color:#666;">Чек отправлен на почту (демо)</p>
+                <button class="btn btn-ghost" onclick="closeModal()">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 AI Music Lab. Демо-проект для портфолио.</p>
+            <p style="font-size: 0.8rem; color: #333;">Реальная генерация музыки требует серверов с GPU — данный проект демонстрирует интерфейс и логику оплаты.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- ЛОГИКА (без изменений) ---
+        const form = document.getElementById('music-form');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressLabel = document.getElementById('progress-label');
+        const result = document.getElementById('result');
+        const resultPrompt = document.getElementById('result-prompt');
+        const audioPlayer = document.getElementById('audio-player');
+        const downloadBtn = document.getElementById('download-btn');
+        const payModal = document.getElementById('pay-modal');
+        const payOffer = document.getElementById('pay-offer');
+        const paySuccess = document.getElementById('pay-success');
+        const payConfirm = document.getElementById('pay-confirm');
+
+        let paid = false;
+        let wavBlob = null;
+
+        // Генерация WAV файла (простая мелодия)
+        function generateWav(prompt) {
+            const sampleRate = 22050;
+            const duration = 5;
+            const scale = prompt.includes('груст') || prompt.includes('меланхол') ? [220, 262, 330, 392] : [262, 330, 392, 523];
+            const numSamples = sampleRate * duration;
+            const buffer = new ArrayBuffer(44 + numSamples * 2);
+            const view = new DataView(buffer);
+            
+            const writeStr = (offset, s) => { for (let i = 0; i < s.length; i++) view.setUint8(offset + i, s.charCodeAt(i)); };
+            writeStr(0, 'RIFF'); view.setUint32(4, 36 + numSamples * 2, true); writeStr(8, 'WAVE');
+            writeStr(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true); view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+            writeStr(36, 'data'); view.setUint32(40, numSamples * 2, true);
+            
+            let offset = 44;
+            for (let i = 0; i < numSamples; i++) {
+                const t = i / sampleRate;
+                const noteIdx = Math.floor(t * 2) % scale.length;
+                const freq = scale[(noteIdx + prompt.length) % scale.length];
+                let sample = Math.sin(2 * Math.PI * freq * t) * 0.3;
+                sample += Math.sin(2 * Math.PI * freq * 2 * t) * 0.1;
+                const fade = Math.min(1, (duration - t) * 2);
+                view.setInt16(offset, sample * fade * 32767, true);
+                offset += 2;
+            }
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const prompt = document.getElementById('prompt-input').value;
+            progressContainer.style.display = 'block';
+            progressLabel.style.display = 'block';
+            result.style.display = 'none';
+            paid = false;
+            downloadBtn.textContent = '⬇ Скачать трек — 49 ₽';
+            downloadBtn.style.background = ''; 
+
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    progressLabel.style.display = 'none';
+                    wavBlob = generateWav(prompt);
+                    audioPlayer.src = URL.createObjectURL(wavBlob);
+                    resultPrompt.textContent = 'Запрос: «' + prompt + '»';
+                    result.style.display = 'block';
+                    progressContainer.style.display = 'none';
+                    progressBar.style.width = '0%';
+                } else {
+                    width += Math.random() * 10;
+                    if (width > 100) width = 100;
+                    progressBar.style.width = width + '%';
+                }
+            }, 200);
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            payModal.classList.add('active');
+            payOffer.style.display = 'block';
+            paySuccess.style.display = 'none';
+        });
+
+        payConfirm.addEventListener('click', () => {
+            paid = true;
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(wavBlob);
+            a.download = 'ai-generated-track.wav';
+            a.click();
+            payOffer.style.display = 'none';
+            paySuccess.style.display = 'block';
+            downloadBtn.textContent = '⬇ Скачано! Спасибо за покупку';
+            downloadBtn.style.background = 'linear-gradient(135deg, #00e5a0, #00a86b)';
+        });
+
+        function closeModal() { 
+            payModal.classList.remove('active'); 
+        }
+
+        payModal.addEventListener('click', (e) => { if (e.target === payModal) closeModal(); });
+
+        // Анимация появления блоков при скролле
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // --- ПАРАЛЛАКС ЭФФЕКТ (ВАРИАНТ 2) ---
+   // --- ПАРАЛЛАКС ЭФФЕКТ + СВЕЧЕНИЕ ЗА КУРСОРОМ ---
+const parallaxBg = document.getElementById('parallax-bg');
+const cursorGlow = document.querySelector('.cursor-glow');
+let targetX = 0, targetY = 0, curX = 0, curY = 0;
+
+window.addEventListener('mousemove', (e) => {
+    // Нормализуем позицию курсора: от -1 до 1
+    targetX = (e.clientX / window.innerWidth - 0.5) * 2;
+    targetY = (e.clientY / window.innerHeight - 0.5) * 2;
+
+    // Ореол следует за курсором
+    cursorGlow.style.left = e.clientX + 'px';
+    cursorGlow.style.top = e.clientY + 'px';
+});
+
+// Плавное движение фона через requestAnimationFrame (эффект инерции)
+function animateParallax() {
+    curX += (targetX - curX) * 0.05; // чем меньше коэффициент, тем плавнее
+    curY += (targetY - curY) * 0.05;
+    parallaxBg.style.transform = `translate(${curX * -40}px, ${curY * -40}px)`;
+    requestAnimationFrame(animateParallax);
+}
+animateParallax();
+
+
+    </script>
+</body>
+</html>
