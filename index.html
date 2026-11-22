@@ -596,10 +596,11 @@
         function detectMood(text) {
             const t = text.toLowerCase();
             if (/груст|печал|одинок|слез|дожд|расст|проща|потер/.test(t)) return 'sad';
-            if /люб|нежн|сердц|поцелу|романт|влюб|твой/.test(t)) return 'romantic';
-            if /эпич|герой|битв|велик|легенд|космос|битва|дракон/.test(t)) return 'epic';
+            if (/люб|нежн|сердц|поцелу|романт|влюб|твой/.test(t)) return 'romantic';
+            if (/эпич|герой|битв|велик|легенд|космос|дракон/.test(t)) return 'epic';
             return 'fun';
         }
+
 
         // Банки рифмованных пар: каждая пара — [слово, слово-рифма] + хвосты для строк
         const RHYME_SETS = {
