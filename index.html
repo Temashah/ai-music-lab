@@ -61,6 +61,8 @@
         .btn-ghost-sidebar:hover { border-color: #444; color: white; }
 
         /* ===== Контент ===== */
+        .page { display: none; }
+        .page.active { display: block; }
         .main-content { flex: 1; padding: 40px; overflow-y: auto; position: relative; }
         .hero-header { margin-bottom: 60px; }
         .hero-title { font-size: 3.5rem; font-weight: 800; margin-bottom: 16px; line-height: 1.1; }
@@ -92,7 +94,6 @@
             border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
         }
         .btn-create:hover { box-shadow: 0 0 20px rgba(255,0,85,0.4); transform: scale(1.02); }
-        .btn-create:disabled { opacity: 0.5; cursor: not-allowed; }
         .quick-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
         .tag {
             background: rgba(255,255,255,0.05); color: var(--text-muted); padding: 8px 16px;
@@ -118,8 +119,50 @@
             box-shadow: 0 0 20px rgba(0, 229, 160, 0.3);
         }
         .btn-download:hover { transform: scale(1.02); box-shadow: 0 0 35px rgba(0, 229, 160, 0.6); }
-        .btn-download:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .download-note { text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; }
+
+        /* ===== СТРАНИЦА «ТЕКСТ» ===== */
+        .text-tool-header { margin-bottom: 30px; }
+        .text-tool-header h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 10px; }
+        .text-tool-header p { color: var(--text-muted); max-width: 620px; }
+        .idea-wrapper {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 24px; display: flex; flex-direction: column; gap: 16px;
+        }
+        .mood-selector { display: flex; flex-wrap: wrap; gap: 10px; }
+        .mood-chip {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-muted);
+            padding: 8px 18px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: 0.2s;
+        }
+        .mood-chip.selected { background: var(--accent); color: white; border-color: var(--accent); font-weight: 700; }
+        .btn-lyrics {
+            align-self: flex-start; background: var(--accent); color: white; border: none;
+            padding: 16px 32px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .btn-lyrics:hover { box-shadow: 0 0 20px rgba(255,0,85,0.4); transform: scale(1.02); }
+        .lyrics-result {
+            display: none; margin-top: 30px; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: 16px; padding: 30px;
+            animation: slideUp 0.5s ease-out;
+        }
+        .lyrics-result.show { display: block; }
+        .lyrics-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 4px; }
+        .lyrics-mood { color: var(--gold); font-size: 0.85rem; margin-bottom: 20px; }
+        .lyrics-body {
+            white-space: pre-wrap; font-size: 1.02rem; line-height: 1.9; color: #e8e8e8;
+            font-family: Georgia, 'Times New Roman', serif;
+        }
+        .lyrics-body .section-tag { color: var(--accent); font-weight: 800; font-family: inherit; letter-spacing: 1px; font-size: 0.85rem; text-transform: uppercase; }
+        .lyrics-actions { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+        .btn-copy, .btn-use {
+            padding: 14px 24px; border-radius: 12px; font-weight: 700; cursor: pointer;
+            border: none; transition: 0.2s; font-size: 0.95rem;
+        }
+        .btn-copy { background: rgba(255,255,255,0.08); color: white; border: 1px solid var(--border); }
+        .btn-copy:hover { border-color: white; }
+        .btn-use { background: linear-gradient(135deg, var(--green), #00a86b); color: #04120c; }
+        .btn-use:hover { transform: scale(1.03); box-shadow: 0 0 20px rgba(0,229,160,0.4); }
+        .lyrics-typing { color: var(--text-muted); font-size: 0.9rem; margin-top: 8px; min-height: 1.2em; }
 
         /* ===== Хук со скидками ===== */
         .promo-overlay {
@@ -211,9 +254,7 @@
             position: fixed; top: -40px; font-size: 1.4rem; z-index: 3000;
             animation: fall 3s linear forwards; pointer-events: none;
         }
-        @keyframes fall {
-            to { transform: translateY(110vh) rotate(360deg); opacity: 0.6; }
-        }
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0.6; } }
 
         /* ===== Примеры ===== */
         .examples-section { margin-top: 60px; }
@@ -249,23 +290,23 @@
     <aside class="sidebar">
         <div class="logo-area">🎵 AI Music Lab</div>
         <div class="menu-group">
-            <a class="nav-link active">🏠 Главная</a>
-            <a class="nav-link">📊 Чарты</a>
+            <a class="nav-link active" data-page="home">🏠 Главная</a>
+            <a class="nav-link" onclick="alert('Раздел «Чарты» скоро появится!')">📊 Чарты</a>
         </div>
         <div class="menu-group">
             <div class="menu-title">Инструменты</div>
-            <a class="nav-link">🎼 Песня</a>
-            <a class="nav-link">📝 Текст</a>
-            <a class="nav-link">🎤 Кавер</a>
-            <a class="nav-link">💌 Открытка</a>
-            <a class="nav-link">👤 Аватар</a>
-            <a class="nav-link">🔊 Звук</a>
+            <a class="nav-link" data-page="home">🎼 Песня</a>
+            <a class="nav-link" data-page="text">📝 Текст</a>
+            <a class="nav-link" onclick="alert('Инструмент «Кавер» в разработке!')">🎤 Кавер</a>
+            <a class="nav-link" onclick="alert('Инструмент «Открытка» в разработке!')">💌 Открытка</a>
+            <a class="nav-link" onclick="alert('Инструмент «Аватар» в разработке!')">👤 Аватар</a>
+            <a class="nav-link" onclick="alert('Инструмент «Звук» в разработке!')">🔊 Звук</a>
         </div>
         <div class="menu-group">
             <div class="menu-title">Дополнительно</div>
-            <a class="nav-link">📂 Каталог промптов</a>
-            <a class="nav-link">🔗 Промпт из трека</a>
-            <a class="nav-link">🎹 Трек в текст</a>
+            <a class="nav-link" onclick="alert('Каталог промптов в разработке!')">📂 Каталог промптов</a>
+            <a class="nav-link" onclick="alert('Промпт из трека в разработке!')">🔗 Промпт из трека</a>
+            <a class="nav-link" onclick="alert('Трек в текст в разработке!')">🎹 Трек в текст</a>
         </div>
         <div class="sidebar-bottom">
             <button class="btn-primary-sidebar" onclick="alert('Демо: регистрация')">Создать аккаунт</button>
@@ -275,75 +316,112 @@
 
     <!-- ===== Контент ===== -->
     <main class="main-content">
-        <header class="hero-header">
-            <h1 class="hero-title">Создать песню<br>с помощью нейросети</h1>
-            <p class="hero-subtitle">Опишите идею своими словами или вставьте текст — и получите готовую песню. Скачайте её сразу после генерации.</p>
 
-            <div class="prompt-wrapper">
+        <!-- СТРАНИЦА: ГЛАВНАЯ -->
+        <div class="page active" id="page-home">
+            <header class="hero-header">
+                <h1 class="hero-title">Создать песню<br>с помощью нейросети</h1>
+                <p class="hero-subtitle">Опишите идею своими словами или вставьте текст — и получите готовую песню. Скачайте её сразу после генерации.</p>
+
+                <div class="prompt-wrapper">
+                    <div class="prompt-top">
+                        <div class="model-selector">Suno V6 ▼</div>
+                        <button class="dice-btn" onclick="randomPrompt()" title="Случайная идея">🎲</button>
+                    </div>
+                    <textarea id="prompt-input" placeholder="Например: весёлая детская песня про сына Мишу, который обожает динозавров"></textarea>
+                    <div class="actions-row">
+                        <button class="btn-create" id="create-btn" onclick="startGeneration()">Создать песню</button>
+                        <span style="color: var(--gold); font-size: 0.85rem;">🔥 Сейчас: 69 ₽ вместо 199 ₽</span>
+                    </div>
+                    <div class="quick-tags">
+                        <div class="tag" onclick="setPrompt('Весёлая песня на день рождения для друга, много веселья и поздравлений')">День рождения</div>
+                        <div class="tag" onclick="setPrompt('Тёплая трогательная песня для мамы, спасибо за заботу')">Маме</div>
+                        <div class="tag" onclick="setPrompt('Романтичная песня для любимого человека, нежная и душевная')">Любимому</div>
+                        <div class="tag" onclick="setPrompt('Сказочная детская песня про динозавров, весёлая и добрая')">Ребёнку</div>
+                        <div class="tag" onclick="setPrompt('Праздничная песня для свадьбы, счастливая и торжественная')">Свадьба</div>
+                    </div>
+                </div>
+
+                <div class="result-panel" id="result-panel">
+                    <h3 class="result-title">Ваш трек готов! 🎧</h3>
+                    <p class="result-prompt" id="result-prompt"></p>
+                    <audio id="audio-player" controls class="result-audio"></audio>
+                    <button class="btn-download" id="download-btn" onclick="downloadTrack()">⬇ Скачать трек</button>
+                    <p class="download-note">Файл в формате WAV скачается на ваш компьютер автоматически</p>
+                </div>
+            </header>
+
+            <section class="pricing-section">
+                <div class="section-title"><h2>🔥 Выгодные предложения</h2></div>
+                <div class="pricing-grid">
+                    <div class="price-card">
+                        <h3 class="plan-name">1 трек</h3>
+                        <span class="old-price">199 ₽</span>
+                        <div class="new-price">69 ₽</div>
+                        <span class="per">за генерацию · −65%</span>
+                        <button class="btn-buy" onclick="buyPlan('1 трек — 69 ₽')">Купить</button>
+                    </div>
+                    <div class="price-card featured">
+                        <span class="hot-badge">ХИТ ПРОДАЖ</span>
+                        <h3 class="plan-name">5 треков</h3>
+                        <span class="old-price">519 ₽</span>
+                        <div class="new-price">249 ₽</div>
+                        <span class="per">всего 49,80 ₽ за трек · −52%</span>
+                        <button class="btn-buy" onclick="buyPlan('5 треков — 249 ₽')">Купить</button>
+                    </div>
+                    <div class="price-card">
+                        <h3 class="plan-name">Подписка на месяц</h3>
+                        <span class="old-price">Обычная цена выше</span>
+                        <div class="new-price">55 ₽</div>
+                        <span class="per">в месяц · безлимит генераций</span>
+                        <button class="btn-buy green" onclick="buyPlan('Подписка — 55 ₽/мес')">Оформить</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="examples-section">
+                <div class="section-title"><h2>Послушайте, что создают пользователи</h2></div>
+                <div class="grid" id="examples-grid"></div>
+            </section>
+        </div>
+
+        <!-- СТРАНИЦА: ТЕКСТ -->
+        <div class="page" id="page-text">
+            <header class="text-tool-header">
+                <h1>📝 Генератор текста песен</h1>
+                <p>Скинь сырую идею в пару словах — нейросеть разложит её на куплеты, припев и бридж. С рифмами, настроением и структурой настоящего хита.</p>
+            </header>
+
+            <div class="idea-wrapper">
                 <div class="prompt-top">
-                    <div class="model-selector">Suno V6 ▼</div>
-                    <button class="dice-btn" onclick="randomPrompt()" title="Случайная идея">🎲</button>
+                    <div class="model-selector" id="text-model">Поэт V2 ▼</div>
+                    <button class="dice-btn" onclick="randomIdea()" title="Случайная идея">🎲</button>
                 </div>
-                <textarea id="prompt-input" placeholder="Например: весёлая детская песня про сына Мишу, который обожает динозавров"></textarea>
-                <div class="actions-row">
-                    <button class="btn-create" id="create-btn" onclick="startGeneration()">Создать песню</button>
-                    <span style="color: var(--gold); font-size: 0.85rem;">🔥 Сейчас: 69 ₽ вместо 199 ₽</span>
+                <textarea id="idea-input" placeholder="Например: кот который ест сосиски по ночам"></textarea>
+
+                <div class="mood-selector" id="mood-selector">
+                    <div class="mood-chip" data-mood="fun">😄 Весёлое</div>
+                    <div class="mood-chip" data-mood="sad">🌧 Грустное</div>
+                    <div class="mood-chip" data-mood="romantic">💖 Романтичное</div>
+                    <div class="mood-chip" data-mood="epic">⚡ Эпичное</div>
+                    <div class="mood-chip" data-mood="auto">🤖 Определить само</div>
                 </div>
-                <div class="quick-tags">
-                    <div class="tag" onclick="setPrompt('Весёлая песня на день рождения для друга, много веселья и поздравлений')">День рождения</div>
-                    <div class="tag" onclick="setPrompt('Тёплая трогательная песня для мамы, спасибо за заботу')">Маме</div>
-                    <div class="tag" onclick="setPrompt('Романтичная песня для любимого человека, нежная и душевная')">Любимому</div>
-                    <div class="tag" onclick="setPrompt('Сказочная детская песня про динозавров, весёлая и добрая')">Ребёнку</div>
-                    <div class="tag" onclick="setPrompt('Праздничная песня для свадьбы, счастливая и торжественная')">Свадьба</div>
-                </div>
+
+                <button class="btn-lyrics" id="lyrics-btn" onclick="generateLyrics()">✨ Написать текст</button>
             </div>
 
-            <!-- Результат генерации -->
-            <div class="result-panel" id="result-panel">
-                <h3 class="result-title">Ваш трек готов! 🎧</h3>
-                <p class="result-prompt" id="result-prompt"></p>
-                <audio id="audio-player" controls class="result-audio"></audio>
-                <button class="btn-download" id="download-btn" onclick="downloadTrack()">⬇ Скачать трек</button>
-                <p class="download-note">Файл в формате WAV скачается на ваш компьютер автоматически</p>
-            </div>
-        </header>
-
-        <!-- ===== Тарифы ===== -->
-        <section class="pricing-section">
-            <div class="section-title"><h2>🔥 Выгодные предложения</h2></div>
-            <div class="pricing-grid">
-                <div class="price-card">
-                    <h3 class="plan-name">1 трек</h3>
-                    <span class="old-price">199 ₽</span>
-                    <div class="new-price">69 ₽</div>
-                    <span class="per">за генерацию · −65%</span>
-                    <button class="btn-buy" onclick="buyPlan('1 трек — 69 ₽')">Купить</button>
-                </div>
-                <div class="price-card featured">
-                    <span class="hot-badge">ХИТ ПРОДАЖ</span>
-                    <h3 class="plan-name">5 треков</h3>
-                    <span class="old-price">519 ₽</span>
-                    <div class="new-price">249 ₽</div>
-                    <span class="per">всего 49,80 ₽ за трек · −52%</span>
-                    <button class="btn-buy" onclick="buyPlan('5 треков — 249 ₽')">Купить</button>
-                </div>
-                <div class="price-card">
-                    <h3 class="plan-name">Подписка на месяц</h3>
-                    <span class="old-price">Обычная цена выше</span>
-                    <div class="new-price">55 ₽</div>
-                    <span class="per">в месяц · безлимит генераций</span>
-                    <button class="btn-buy green" onclick="buyPlan('Подписка — 55 ₽/мес')">Оформить</button>
+            <div class="lyrics-result" id="lyrics-result">
+                <div class="lyrics-title" id="lyrics-title"></div>
+                <div class="lyrics-mood" id="lyrics-mood"></div>
+                <div class="lyrics-body" id="lyrics-body"></div>
+                <p class="lyrics-typing" id="lyrics-typing"></p>
+                <div class="lyrics-actions">
+                    <button class="btn-copy" onclick="copyLyrics()">📋 Скопировать текст</button>
+                    <button class="btn-use" onclick="useLyricsInSong()">🎼 Использовать в песне</button>
+                    <button class="btn-copy" onclick="generateLyrics()">🔄 Ещё вариант</button>
                 </div>
             </div>
-        </section>
-
-        <!-- ===== Примеры ===== -->
-        <section class="examples-section">
-            <div class="section-title">
-                <h2>Послушайте, что создают пользователи</h2>
-            </div>
-            <div class="grid" id="examples-grid"></div>
-        </section>
+        </div>
 
         <footer>
             <p>© 2024 AI Music Lab. Демо-версия интерфейса.</p>
@@ -403,6 +481,19 @@
         const createBtn = document.getElementById('create-btn');
 
         let wavBlob = null;
+        let currentLyrics = '';
+        let selectedMood = 'auto';
+
+        // ===== ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ =====
+        document.querySelectorAll('.nav-link[data-page]').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                link.classList.add('active');
+                document.getElementById('page-' + link.dataset.page).classList.add('active');
+                window.scrollTo(0, 0);
+            });
+        });
 
         // ===== ХУК: поп-ап при входе =====
         setTimeout(() => {
@@ -419,7 +510,6 @@
             launchConfetti();
         }
 
-        // Таймер акции (24 часа, живёт в localStorage)
         function startCountdown() {
             const el = document.getElementById('countdown');
             let deadline = localStorage.getItem('promoDeadline');
@@ -451,7 +541,17 @@
             }
         }
 
-        // ===== Кубик: случайный промпт =====
+        // ===== Выбор настроения (на странице «Текст») =====
+        document.querySelectorAll('#mood-selector .mood-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('#mood-selector .mood-chip').forEach(c => c.classList.remove('selected'));
+                chip.classList.add('selected');
+                selectedMood = chip.dataset.mood;
+            });
+        });
+        document.querySelector('#mood-selector .mood-chip[data-mood="auto"]').classList.add('selected');
+
+        // ===== Кубики =====
         const ideas = [
             'Меланхоличный лоу-фай бит с пианино и шумом дождя',
             'Энергичный синтвейв про ночную дорогу и неоновые огни',
@@ -466,15 +566,191 @@
             promptInput.value = ideas[Math.floor(Math.random() * ideas.length)];
         }
 
+        const rawIdeas = [
+            'кот который ест сосиски по ночам',
+            'первый день на новой работе',
+            'бабушкины пирожки на даче',
+            'псоледний звонок в школе',
+            'путешествие на поезде к морю',
+            'дедушка и его старая гитара',
+            'первый снег и ожидание праздника',
+            'как я проспал будильник'
+        ];
+        function randomIdea() {
+            document.getElementById('idea-input').value = rawIdeas[Math.floor(Math.random() * rawIdeas.length)];
+        }
+
         function setPrompt(text) { promptInput.value = text; }
 
-        // ===== ГЕНЕРАЦИЯ WAV (уникальный трек каждый раз) =====
+        /* ============================================================
+           ГЕНЕРАТОР ТЕКСТА ПЕСЕН
+           ============================================================ */
+        const MOODS = {
+            fun:    { name: 'весёлое',    emoji: '😄' },
+            sad:    { name: 'грустное',   emoji: '🌧' },
+            romantic: { name: 'романтичное', emoji: '💖' },
+            epic:   { name: 'эпичное',    emoji: '⚡' }
+        };
+
+        // Определение настроения по словам в идее
+        function detectMood(text) {
+            const t = text.toLowerCase();
+            if (/груст|печал|одинок|слез|дожд|расст|проща|потер/.test(t)) return 'sad';
+            if /люб|нежн|сердц|поцелу|романт|влюб|твой/.test(t)) return 'romantic';
+            if /эпич|герой|битв|велик|легенд|космос|битва|дракон/.test(t)) return 'epic';
+            return 'fun';
+        }
+
+        // Банки рифмованных пар: каждая пара — [слово, слово-рифма] + хвосты для строк
+        const RHYME_SETS = {
+            fun: [
+                { a: 'до утра',   ta: ['Мы танцуем и поём', 'Веселье кружит с '] , b: 'двора',   tb: ['И смеётся детвора', 'Гуляет шумная во'] },
+                { a: 'веселее',   ta: ['С каждым днём — лишь', 'Жизнь без грусти — '],  b: 'жарче',    tb: ['И душа поёт всё', 'Пляшет сердце в такт, всё'] },
+                { a: 'кто-то',    ta: ['Улыбнись на весь мир, ведь', 'Танцуй со мной, приди, ведь'] , b: 'занят',  tb: ['Скука здесь совсем не', 'Грустить сегодня мы не'] }
+            ],
+            sad: [
+                { a: 'дождь',     ta: ['За окном шумит ночной', 'В память каплет, как'] , b: 'зажечь',  tb: ['И я не в силах свечку', 'В сердце тихо тлеет, не'] },
+                { a: 'туман',     ta: ['Город скрылся в сером', 'Мои мечты — в сплошном'] , b: 'услад',   tb: ['Ищу в этом мире', 'Память прошлого — мой'] }
+            ],
+            romantic: [
+                { a: 'любовь',    ta: ['Всё, что дышит во мне, — это', 'Ты моя солнечная'] , b: 'вновь',   tb: ['К тебе спешит душа, я влюблён', 'Сердце стучит: увидимся'] },
+                { a: 'глаза',     ta: ['Тонут я в твоих', 'Вмиг тают в этих'] , b: 'небеса',  tb: ['Ты красива, как', 'Рядом с тобой — как'] }
+            ],
+            epic: [
+                { a: 'впереди',   ta: ['Гроза и слава — всё', 'Нас зовут битвы, всё'] , b: 'путь',    tb: ['Я вхожу в свой длинный', 'Меч окуют, не свернуть'] },
+                { a: 'буря',      ta: ['Нас несёт сквозь время', 'Сердце гремит, как'] , b: 'полёт',   tb: ['Крылья развернулись в', 'Мы взлетаем — наш'] }
+            ]
+        };
+
+        // Шаблоны куплетов: {intro} перед рифмой, {hook} — тема
+        const VERSE_STARTS = {
+            fun: ['Ты только посмотри, как', 'Собирайся, время', 'Мы встречаем этот'],
+            sad: ['Помнишь, как тогда мы', 'Тихо падают звёзды, и', 'Пустота в окне — там'],
+            romantic: ['В твоих ладонях тепло, и', 'Ты во сне приходишь, и', 'Между нами свет — он'],
+            epic: ['Слышишь, рог трубит — пора', 'Ветер воет, знамя', 'Мы идём туда, где']
+        };
+
+        const HOOKS = {
+            fun: ['Это про {X} — танцуем до утра!', 'Эй, {X} — праздник начинается!', '{X} — вот что делает нас счастливей!'],
+            sad: ['А в сердце — только {X} и тишина…', '{X} остаётся со мной наедине…', 'Помнишь, как мы пели о {X}?'],
+            romantic: ['Ты — мой свет, моя {X}.', 'Всё во мне поёт о {X}.', 'Я влюблён — навсегда про {X}.'],
+            epic: ['Вперёд! Пусть знает весь мир о {X}!', 'Сквозь огонь и тьму — за {X}!', 'Это история о {X} — запомни её!']
+        };
+
+        const BRIDGES = ['И пусть весь мир подождёт…', 'Закрой глаза — дыши глубже…', 'Одна только нота — и всё замирает…', 'Тише… слышишь этот аккорд?'];
+
+        function cleanIdea(idea) {
+            return idea.trim().replace(/[.!?]+$/, '');
+        }
+
+        function shortTheme(idea) {
+            const words = cleanIdea(idea).split(/\s+/);
+            return words.slice(0, 3).join(' ');
+        }
+
+        function pickRhymeSet(mood) {
+            const sets = RHYME_SETS[mood];
+            return sets[Math.floor(Math.random() * sets.length)];
+        }
+
+        function buildCouplet(mood, theme) {
+            const set = pickRhymeSet(mood);
+            const starts = VERSE_STARTS[mood];
+            const lines = [
+                starts[Math.floor(Math.random() * starts.length)] + ', ' + set.ta[Math.floor(Math.random() * set.ta.length)] + ' ' + set.a + '.',
+                theme ? 'Про ' + theme + ' поёт моя душа.' : 'И каждый день неповторим.',
+                starts[Math.floor(Math.random() * starts.length)] + ' — и это только ' + set.b + '.',
+                theme ? 'Всё это про ' + theme + ' — запомни, мне не изменишь ты!'
+                      : 'И в этом мире нам вдвоём хорошо!'
+            ];
+            return lines;
+        }
+
+        function buildChorus(mood, theme) {
+            const hooks = HOOKS[mood];
+            const hook = hooks[Math.floor(Math.random() * hooks.length)].replace('{X}', theme || 'эта песня');
+            const set = pickRhymeSet(mood);
+            return [
+                hook,
+                set.ta[Math.floor(Math.random() * set.ta.length)] + ' ' + set.a + '!',
+                hook.replace('{X}', theme || 'эта песня'),
+                set.tb[Math.floor(Math.random() * set.tb.length)] + ' ' + set.b + '!'
+            ];
+        }
+
+        function buildTitle(mood, idea) {
+            const adjectives = {
+                fun: ['Танцевальная', 'Дерзкая', 'Весёлая'],
+                sad: ['Тихая', 'Дождливая', 'Ночная'],
+                romantic: ['Нежная', 'Лунная', 'Сердечная'],
+                epic: ['Великая', 'Героическая', 'Огненная']
+            };
+            const adj = adjectives[mood][Math.floor(Math.random() * adjectives[mood].length)];
+            const theme = shortTheme(idea);
+            return '«' + adj + ' ' + theme + '»';
+        }
+
+        function generateLyrics() {
+            const ideaInput = document.getElementById('idea-input');
+            const idea = ideaInput.value.trim();
+            if (!idea) { alert('Сначала скинь идею!'); return; }
+
+            const mood = selectedMood === 'auto' ? detectMood(idea) : selectedMood;
+            const theme = shortTheme(idea);
+
+            const btn = document.getElementById('lyrics-btn');
+            const typing = document.getElementById('lyrics-typing');
+            btn.disabled = true;
+            typing.textContent = 'Нейросеть подбирает рифмы…';
+
+            // имитация работы: 1.2 секунды «думания»
+            setTimeout(() => {
+                const couplet1 = buildCouplet(mood, theme);
+                const chorus = buildChorus(mood, theme);
+                const couplet2 = buildCouplet(mood, theme);
+                const bridge = BRIDGES[Math.floor(Math.random() * BRIDGES.length)];
+
+                const title = buildTitle(mood, idea);
+                currentLyrics =
+                    '[Вступление]\n' + couplet1[0] + '\n\n' +
+                    '[Куплет 1]\n' + couplet1.join('\n') + '\n\n' +
+                    '[Припев]\n' + chorus.join('\n') + '\n\n' +
+                    '[Куплет 2]\n' + couplet2.join('\n') + '\n\n' +
+                    '[Бридж]\n' + bridge + '\n' + chorus.join('\n') + '\n\n' +
+                    '[Финал]\n' + chorus.join('\n');
+
+                document.getElementById('lyrics-title').textContent = '🎵 ' + title;
+                document.getElementById('lyrics-mood').textContent = 'Настроение: ' + MOODS[mood].emoji + ' ' + MOODS[mood].name;
+                document.getElementById('lyrics-body').textContent = currentLyrics;
+
+                document.getElementById('lyrics-result').classList.add('show');
+                btn.disabled = false;
+                typing.textContent = 'Готово! Хочешь другой вариант — жми «Ещё вариант».';
+                document.getElementById('lyrics-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 1200);
+        }
+
+        function copyLyrics() {
+            navigator.clipboard.writeText(currentLyrics).then(() => {
+                launchConfetti();
+                alert('📋 Текст скопирован в буфер обмена!');
+            }).catch(() => alert('Не удалось скопировать — выдели текст вручную.'));
+        }
+
+        function useLyricsInSong() {
+            // Переносим тему в промпт главной страницы и переключаемся туда
+            const idea = document.getElementById('idea-input').value.trim();
+            promptInput.value = idea + ' — текст песни: «' + currentLyrics.replace(/\n/g, '; ') + '»';
+            document.querySelector('.nav-link[data-page="home"]').click();
+            launchConfetti();
+        }
+
+        // ===== ГЕНЕРАЦИЯ WAV =====
         function generateWav(prompt) {
             const sampleRate = 22050;
             const duration = 10;
             const numSamples = sampleRate * duration;
 
-            // --- заголовок WAV ---
             const buffer = new ArrayBuffer(44 + numSamples * 2);
             const view = new DataView(buffer);
             const writeStr = (offset, s) => {
@@ -486,7 +762,6 @@
             view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
             writeStr(36, 'data'); view.setUint32(40, numSamples * 2, true);
 
-            // --- каждый запуск — новая «вселенная» трека ---
             const isSad = /груст|меланхол|печал|дожд|одинок/i.test(prompt);
             const tempo = Math.round(isSad ? 70 + Math.random() * 25 : 95 + Math.random() * 45);
             const beat = 60 / tempo;
@@ -507,7 +782,6 @@
                 return Math.sin(phase);
             };
 
-            // --- паттерн мелодии с паузами ---
             const totalSteps = Math.ceil(duration / step);
             const melodyEvents = [];
             for (let s = 0; s < totalSteps; s++) {
@@ -521,13 +795,11 @@
                 }
             }
 
-            // кик: сильные доли + случайно слабые
             const kickSteps = [];
             for (let s = 0; s < totalSteps; s += 2) {
                 if (s % 4 === 0 || Math.random() < 0.3) kickSteps.push(s);
             }
 
-            // --- рендер ---
             let offset = 44;
             for (let i = 0; i < numSamples; i++) {
                 const t = i / sampleRate;
@@ -570,7 +842,7 @@
             return new Blob([buffer], { type: 'audio/wav' });
         }
 
-        // ===== Логика генерации =====
+        // ===== Логика генерации трека =====
         function startGeneration() {
             const prompt = promptInput.value.trim();
             if (!prompt) { alert('Опишите идею песни!'); return; }
@@ -611,7 +883,6 @@
             resultPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        // ===== РЕАЛЬНОЕ СКАЧИВАНИЕ =====
         function downloadTrack() {
             if (!wavBlob) return;
             downloadBtn.disabled = true;
@@ -624,7 +895,6 @@
             setTimeout(() => { downloadBtn.disabled = false; }, 2000);
         }
 
-        // ===== Покупка тарифа (демо) =====
         function buyPlan(name) {
             launchConfetti();
             alert('🎉 Отлично! Тариф «' + name + '» оформлен (демо-режим, деньги не списываются).');
