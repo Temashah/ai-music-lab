@@ -3,476 +3,480 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Music Lab — Создай свой трек</title>
+    <title>AI Music Lab — Создать песню с нейросетью</title>
     <style>
-        /* ================= БАЗА ================= */
         :root {
-            --neon-purple: #7b2ff7;
-            --neon-pink: #ff0055;
-            --neon-green: #00e5a0;
-            --dark: #050508;
+            --bg-body: #0f0f11;
+            --bg-sidebar: #121217;
+            --bg-card: #1e1e24;
+            --accent: #ff0055;
+            --green: #00e5a0;
+            --gold: #ffd700;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --border: #2a2a30;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: var(--dark);
-            color: #fff;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 10; }
-        section { padding: 80px 0; }
-
-        /* ================= ФОН: ШУМ, КЛЯКСЫ, СЕТКА ================= */
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(%23n)" opacity="0.12"/></svg>');
-            pointer-events: none;
-            z-index: 2;
-        }
-        .bg-layer {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            background: radial-gradient(circle at 50% 0%, #1a0b3e 0%, #050508 70%);
-        }
-        .graffiti-blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.45;
-            animation: float 12s infinite alternate ease-in-out;
-        }
-        .blob-1 { width: 320px; height: 320px; background: rgba(123, 47, 247, 0.35); top: -5%; left: -5%; }
-        .blob-2 { width: 420px; height: 420px; background: rgba(255, 0, 85, 0.28); bottom: 5%; right: -8%; animation-delay: -4s; }
-        .blob-3 { width: 300px; height: 300px; background: rgba(0, 229, 160, 0.25); top: 45%; left: 75%; animation-delay: -8s; }
-        .grid-pattern {
-            position: absolute;
-            inset: 0;
-            background-image:
-                radial-gradient(1px 1px at 20px 20px, rgba(255,255,255,0.25) 1px, transparent 2px);
-            background-size: 40px 40px;
-            opacity: 0.15;
-        }
-        .cursor-glow {
-            position: absolute;
-            width: 450px; height: 450px;
-            background: radial-gradient(circle, rgba(123, 47, 247, 0.22), transparent 70%);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            filter: blur(30px);
-            transition: left 0.4s ease-out, top 0.4s ease-out;
-        }
-        @keyframes float {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(40px, -40px); }
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            min-height: 100vh;
         }
 
-        /* ================= ХЕДЕР ================= */
-        header {
-            padding: 20px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            background: rgba(5, 5, 8, 0.8);
-            backdrop-filter: blur(10px);
-            position: sticky; top: 0; z-index: 100;
+        /* ===== Сайдбар ===== */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
         }
-        header .container { display: flex; justify-content: space-between; align-items: center; }
-        .logo {
-            font-weight: 800; font-size: 1.4rem; letter-spacing: 2px;
-            text-transform: uppercase;
-            background: linear-gradient(to right, #fff, #0ff);
-            -webkit-background-clip: text; background-clip: text; color: transparent;
+        .logo-area { font-size: 1.2rem; font-weight: 800; margin-bottom: 40px; color: var(--accent); }
+        .menu-group { margin-bottom: 24px; }
+        .menu-title {
+            text-transform: uppercase; font-size: 0.75rem; color: var(--text-muted);
+            letter-spacing: 1px; margin-bottom: 12px; padding-left: 10px;
         }
-        nav a { color: #888; text-decoration: none; margin-left: 20px; font-weight: 500; transition: 0.3s; }
-        nav a:hover { color: var(--neon-green); }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+            color: var(--text-muted); text-decoration: none; border-radius: 8px;
+            transition: 0.2s; cursor: pointer; font-size: 0.95rem;
+        }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.05); color: white; }
+        .nav-link.active { border-left: 3px solid var(--accent); }
+        .sidebar-bottom { margin-top: auto; }
+        .btn-primary-sidebar {
+            background: var(--accent); color: white; border: none; padding: 12px 16px;
+            border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s;
+        }
+        .btn-primary-sidebar:hover { background: #ff3377; transform: translateY(-1px); }
+        .btn-ghost-sidebar {
+            background: transparent; color: var(--text-muted); border: 1px solid var(--border);
+            padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 8px;
+        }
+        .btn-ghost-sidebar:hover { border-color: #444; color: white; }
 
-        /* ================= HERO ================= */
-        #hero { min-height: 100vh; display: flex; align-items: center; text-align: center; position: relative; }
-        h1 {
-            font-size: 3.5rem; margin-bottom: 20px; line-height: 1.1;
-            text-transform: uppercase; letter-spacing: -2px;
-            background: linear-gradient(90deg, #fff, #0ff, #f0f);
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-            animation: pulse-text 3s infinite alternate;
-        }
-        h1 .accent { color: var(--neon-green); -webkit-text-fill-color: var(--neon-green); }
-        @keyframes pulse-text {
-            0% { filter: drop-shadow(0 0 10px rgba(123, 47, 247, 0.4)); }
-            100% { filter: drop-shadow(0 0 25px rgba(0, 229, 160, 0.5)); }
-        }
-        #hero p { max-width: 600px; margin: 0 auto 40px; color: #aaa; font-size: 1.1rem; }
+        /* ===== Контент ===== */
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; position: relative; }
+        .hero-header { margin-bottom: 60px; }
+        .hero-title { font-size: 3.5rem; font-weight: 800; margin-bottom: 16px; line-height: 1.1; }
+        .hero-subtitle { color: var(--text-muted); max-width: 600px; margin-bottom: 40px; }
 
-        form {
-            max-width: 600px; margin: 0 auto;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            padding: 30px; border-radius: 24px;
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        .prompt-wrapper {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 24px; display: flex; flex-direction: column; gap: 16px;
         }
-        input[type="text"] {
-            width: 100%; padding: 20px; font-size: 18px;
-            border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.3); color: #fff; outline: none; transition: 0.3s;
+        .prompt-top { display: flex; align-items: center; gap: 12px; }
+        .model-selector {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            padding: 8px 16px; border-radius: 8px; color: white; font-size: 0.85rem; cursor: pointer;
         }
-        input[type="text"]:focus { border-color: var(--neon-purple); box-shadow: 0 0 15px rgba(123, 47, 247, 0.3); }
+        .dice-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            padding: 8px 14px; border-radius: 8px; cursor: pointer; color: white; font-size: 1rem;
+            transition: 0.2s;
+        }
+        .dice-btn:hover { border-color: var(--gold); transform: rotate(20deg); }
+        textarea {
+            width: 100%; min-height: 100px; background: transparent; border: none;
+            color: white; font-size: 1rem; resize: none; font-family: inherit;
+        }
+        textarea:focus { outline: none; }
+        .actions-row { display: flex; gap: 12px; align-items: center; }
+        .btn-create {
+            background: var(--accent); color: white; border: none; padding: 16px 32px;
+            border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .btn-create:hover { box-shadow: 0 0 20px rgba(255,0,85,0.4); transform: scale(1.02); }
+        .btn-create:disabled { opacity: 0.5; cursor: not-allowed; }
+        .quick-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+        .tag {
+            background: rgba(255,255,255,0.05); color: var(--text-muted); padding: 8px 16px;
+            border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: 0.2s;
+        }
+        .tag:hover { background: rgba(255,255,255,0.1); color: white; }
 
-        .btn {
-            padding: 18px 40px; font-size: 17px; font-weight: 700; color: white;
-            border: none; border-radius: 50px; cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-transform: uppercase; letter-spacing: 1px;
-            position: relative; overflow: hidden;
+        /* ===== Результат генерации ===== */
+        .result-panel {
+            display: none; margin-top: 30px; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: 16px; padding: 24px;
+            animation: slideUp 0.5s ease-out;
         }
-        .btn::before {
-            content: ''; position: absolute; inset: 0;
-            background: repeating-linear-gradient(-45deg, transparent, transparent 6px, rgba(255,255,255,0.08) 7px, rgba(255,255,255,0.08) 11px);
+        .result-panel.show { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .result-title { font-size: 1.4rem; margin-bottom: 6px; }
+        .result-prompt { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px; }
+        .result-audio { width: 100%; margin-bottom: 16px; }
+        .btn-download {
+            width: 100%; background: linear-gradient(135deg, var(--green), #00a86b); color: #04120c;
+            border: none; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 1.05rem;
+            cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s;
+            box-shadow: 0 0 20px rgba(0, 229, 160, 0.3);
         }
-        .btn-primary {
-            width: 100%;
-            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
-            box-shadow: 0 0 20px rgba(123, 47, 247, 0.4);
-        }
-        .btn-primary:hover { transform: scale(1.03); box-shadow: 0 0 35px rgba(255, 0, 85, 0.6); }
-        .btn-primary:active { transform: scale(0.98); }
-        .btn span { position: relative; z-index: 2; }
-        .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); }
-        .btn-ghost:hover { border-color: #fff; background: rgba(255,255,255,0.05); }
+        .btn-download:hover { transform: scale(1.02); box-shadow: 0 0 35px rgba(0, 229, 160, 0.6); }
+        .btn-download:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .download-note { text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; }
 
-        .progress-container {
-            width: 100%; height: 12px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 6px; margin-top: 20px; display: none; overflow: hidden;
+        /* ===== Хук со скидками ===== */
+        .promo-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
         }
-        .progress-bar {
-            width: 0%; height: 100%;
-            background: linear-gradient(90deg, var(--neon-purple), var(--neon-green));
-            transition: width 0.2s;
+        .promo-overlay.show { display: flex; }
+        .promo-card {
+            position: relative; max-width: 520px; width: 100%; padding: 5px; border-radius: 24px;
+            background: linear-gradient(120deg, var(--accent), var(--gold), var(--green), var(--accent));
+            background-size: 300% 300%; animation: gradientShift 4s ease infinite;
         }
-        #progress-label { margin-top: 10px; color: #888; font-size: 0.9rem; text-align: center; }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .promo-inner { background: #141419; border-radius: 20px; padding: 36px 30px; text-align: center; }
+        .promo-fire { font-size: 3rem; animation: firePulse 1.2s infinite alternate; }
+        @keyframes firePulse { from { transform: scale(1); } to { transform: scale(1.15); } }
+        .promo-title { font-size: 1.7rem; font-weight: 800; margin: 12px 0 6px; }
+        .promo-sub { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; }
+        .promo-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+            border-radius: 12px; padding: 14px 18px; margin-bottom: 10px;
+        }
+        .promo-row .name { font-weight: 700; }
+        .promo-row .old { color: #666; text-decoration: line-through; margin-right: 10px; }
+        .promo-row .new { color: var(--gold); font-weight: 800; font-size: 1.3rem; }
+        .promo-row .save-badge {
+            background: var(--accent); color: white; font-size: 0.7rem; font-weight: 700;
+            padding: 3px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle;
+        }
+        .countdown {
+            margin: 20px 0; font-weight: 800; font-size: 1.2rem; color: var(--gold);
+            background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.25);
+            padding: 10px; border-radius: 12px;
+        }
+        .promo-actions { display: flex; gap: 10px; }
+        .btn-grab {
+            flex: 1; background: linear-gradient(135deg, var(--accent), #ff6600); color: white;
+            border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer;
+            font-size: 1rem; transition: 0.2s; text-transform: uppercase;
+        }
+        .btn-grab:hover { transform: scale(1.03); box-shadow: 0 0 25px rgba(255,0,85,0.5); }
+        .btn-later {
+            background: transparent; color: var(--text-muted); border: 1px solid var(--border);
+            padding: 16px 20px; border-radius: 12px; cursor: pointer; font-size: 0.85rem;
+        }
+        .btn-later:hover { color: white; border-color: #444; }
 
-        #result {
-            display: none; margin: 30px auto 0; max-width: 600px;
-            background: rgba(20, 20, 30, 0.6);
-            padding: 30px; border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
+        /* ===== Тарифы ===== */
+        .pricing-section { margin-top: 60px; }
+        .section-title { margin-bottom: 24px; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+        .price-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 28px 22px; text-align: center; transition: 0.25s; position: relative;
         }
-        #result audio { width: 100%; margin: 20px 0; }
-
-        .note {
-            margin-top: 30px; color: var(--neon-green); font-weight: bold;
-            background: rgba(0, 229, 160, 0.1); padding: 12px 20px;
-            border-radius: 12px; display: inline-block; font-size: 1rem;
-            border: 1px solid rgba(0, 229, 160, 0.2);
+        .price-card:hover { transform: translateY(-6px); border-color: var(--accent); box-shadow: 0 10px 40px rgba(255,0,85,0.2); }
+        .price-card.featured { border-color: var(--gold); }
+        .price-card .plan-name { font-size: 1.15rem; font-weight: 700; margin-bottom: 12px; }
+        .price-card .old-price { color: #666; text-decoration: line-through; font-size: 1rem; }
+        .price-card .new-price { color: var(--gold); font-size: 2.4rem; font-weight: 800; margin: 4px 0; }
+        .price-card .per { color: var(--text-muted); font-size: 0.85rem; }
+        .price-card .btn-buy {
+            width: 100%; margin-top: 18px; background: var(--accent); color: white; border: none;
+            padding: 13px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s;
         }
-
-        /* ================= ЗАГОЛОВКИ СЕКЦИЙ ================= */
-        .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 50px; position: relative; }
-        .section-title::after {
-            content: ''; display: block; width: 60px; height: 4px;
-            background: linear-gradient(90deg, var(--neon-purple), var(--neon-green));
-            margin: 15px auto 0; border-radius: 2px;
-        }
-
-        /* ================= КАК ЭТО РАБОТАЕТ ================= */
-        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        .step-card {
-            text-align: center; padding: 40px 25px;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);
-            transition: 0.3s;
-        }
-        .step-card:hover { transform: translateY(-8px); }
-        .step-icon { font-size: 3rem; display: block; margin-bottom: 20px; }
-        .step-title { font-size: 1.4rem; margin-bottom: 15px; }
-        .step-desc { color: #aaa; }
-
-        /* ================= ТАРИФЫ ================= */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 30px; border-radius: 20px; text-align: center;
-            transition: 0.3s; position: relative; overflow: hidden;
-        }
-        .card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-            background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
-            opacity: 0; transition: 0.3s;
-        }
-        .card:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.06); }
-        .card:hover::before { opacity: 1; }
-        .price-old { text-decoration: line-through; color: #666; font-size: 1.1rem; }
-        .price-new { color: var(--neon-green); font-weight: 800; font-size: 2.2rem; display: block; margin-top: 5px; }
-        .badge {
-            display: inline-block; background: rgba(123, 47, 247, 0.2); color: var(--neon-purple);
-            padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; margin-bottom: 15px;
-        }
-        .card-desc { color: #aaa; margin-bottom: 20px; }
-        .card .btn { width: 100%; }
-        .card .btn-ghost { font-size: 14px; padding: 14px; }
-
-        /* ================= ПРИМЕРЫ ================= */
-        .example-cover {
-            height: 180px; border-radius: 12px; margin-bottom: 15px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 1.2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        .price-card .btn-buy:hover { box-shadow: 0 0 18px rgba(255,0,85,0.45); }
+        .price-card .btn-buy.green { background: linear-gradient(135deg, var(--green), #00a86b); color: #04120c; }
+        .hot-badge {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: var(--accent); color: white; font-size: 0.72rem; font-weight: 800;
+            padding: 4px 14px; border-radius: 20px; white-space: nowrap;
         }
 
-        /* ================= МОДАЛКА ОПЛАТЫ ================= */
+        /* ===== Модалка генерации ===== */
         .modal-overlay {
-            display: flex; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
-            z-index: 1000; align-items: center; justify-content: center;
-            opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none;
+            align-items: center; justify-content: center; z-index: 1000;
         }
-        .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
         .modal {
-            background: rgba(20, 20, 30, 0.95); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
-            padding: 40px; max-width: 450px; width: 90%; text-align: center;
-            position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            transform: scale(0.95); transition: 0.3s;
+            background: var(--bg-card); padding: 40px; border-radius: 20px;
+            width: 90%; max-width: 500px; text-align: center;
         }
-        .modal-overlay.active .modal { transform: scale(1); }
-        .close {
-            position: absolute; top: 15px; right: 20px;
-            background: none; border: none; color: #888; font-size: 24px; cursor: pointer;
+        .progress-bar-container { width: 100%; height: 8px; background: #333; border-radius: 4px; margin: 24px 0; overflow: hidden; }
+        .progress-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s; }
+
+        /* ===== Конфетти ===== */
+        .confetti {
+            position: fixed; top: -40px; font-size: 1.4rem; z-index: 3000;
+            animation: fall 3s linear forwards; pointer-events: none;
         }
-        .close:hover { color: #fff; }
-        .modal h3 { margin-bottom: 10px; }
-        .modal .old { font-size: 1.1rem; color: #666; text-decoration: line-through; }
-        .modal .new { font-size: 3rem; font-weight: 800; color: var(--neon-green); margin: 5px 0; }
-        .pay-methods { display: flex; gap: 10px; justify-content: center; margin: 20px 0; color: #aaa; font-size: 0.9rem; flex-wrap: wrap; }
-        .pay-methods span { background: rgba(255,255,255,0.05); padding: 8px 16px; border-radius: 8px; }
-        .secure-note { font-size: 0.75rem; color: #555; margin-top: 15px; }
-
-        /* ================= ПОЯВЛЕНИЕ ПРИ СКРОЛЛЕ ================= */
-        .fade-in { opacity: 0; transform: translateY(20px); transition: all 0.8s ease-out; }
-        .fade-in.visible { opacity: 1; transform: translateY(0); }
-
-        /* ================= FOOTER ================= */
-        footer {
-            background: #000; color: #555; padding: 40px 0; text-align: center;
-            border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 10;
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); opacity: 0.6; }
         }
 
-        /* ================= АДАПТИВ ================= */
-        @media (max-width: 600px) {
-            h1 { font-size: 2.2rem; }
-            .section-title { font-size: 1.8rem; }
-            nav a { margin-left: 12px; font-size: 0.85rem; }
+        /* ===== Примеры ===== */
+        .examples-section { margin-top: 60px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .track-card {
+            background: var(--bg-card); border-radius: 12px; padding: 16px;
+            display: flex; align-items: center; gap: 16px; transition: 0.2s;
+        }
+        .track-card:hover { transform: translateY(-4px); border: 1px solid var(--border); }
+        .cover {
+            width: 60px; height: 60px; border-radius: 8px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.7);
+        }
+        .track-info h3 { font-size: 1.05rem; margin-bottom: 4px; }
+        .track-info p { color: var(--text-muted); font-size: 0.85rem; }
+        .play-btn {
+            margin-left: auto; background: transparent; border: 1px solid var(--border);
+            color: var(--text-muted); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;
+        }
+        .play-btn:hover { border-color: white; color: white; }
+
+        footer { padding: 30px 20px 10px; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 40px; }
+
+        @media (max-width: 800px) {
+            .sidebar { display: none; }
+            .hero-title { font-size: 2.2rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ФОН -->
-    <div class="bg-layer">
-        <div class="graffiti-blob blob-1"></div>
-        <div class="graffiti-blob blob-2"></div>
-        <div class="graffiti-blob blob-3"></div>
-        <div class="grid-pattern" id="parallax"></div>
-        <div class="cursor-glow" id="cursor-glow"></div>
+    <!-- ===== Сайдбар ===== -->
+    <aside class="sidebar">
+        <div class="logo-area">🎵 AI Music Lab</div>
+        <div class="menu-group">
+            <a class="nav-link active">🏠 Главная</a>
+            <a class="nav-link">📊 Чарты</a>
+        </div>
+        <div class="menu-group">
+            <div class="menu-title">Инструменты</div>
+            <a class="nav-link">🎼 Песня</a>
+            <a class="nav-link">📝 Текст</a>
+            <a class="nav-link">🎤 Кавер</a>
+            <a class="nav-link">💌 Открытка</a>
+            <a class="nav-link">👤 Аватар</a>
+            <a class="nav-link">🔊 Звук</a>
+        </div>
+        <div class="menu-group">
+            <div class="menu-title">Дополнительно</div>
+            <a class="nav-link">📂 Каталог промптов</a>
+            <a class="nav-link">🔗 Промпт из трека</a>
+            <a class="nav-link">🎹 Трек в текст</a>
+        </div>
+        <div class="sidebar-bottom">
+            <button class="btn-primary-sidebar" onclick="alert('Демо: регистрация')">Создать аккаунт</button>
+            <button class="btn-ghost-sidebar" onclick="alert('Демо: вход')">Войти</button>
+        </div>
+    </aside>
+
+    <!-- ===== Контент ===== -->
+    <main class="main-content">
+        <header class="hero-header">
+            <h1 class="hero-title">Создать песню<br>с помощью нейросети</h1>
+            <p class="hero-subtitle">Опишите идею своими словами или вставьте текст — и получите готовую песню. Скачайте её сразу после генерации.</p>
+
+            <div class="prompt-wrapper">
+                <div class="prompt-top">
+                    <div class="model-selector">Suno V6 ▼</div>
+                    <button class="dice-btn" onclick="randomPrompt()" title="Случайная идея">🎲</button>
+                </div>
+                <textarea id="prompt-input" placeholder="Например: весёлая детская песня про сына Мишу, который обожает динозавров"></textarea>
+                <div class="actions-row">
+                    <button class="btn-create" id="create-btn" onclick="startGeneration()">Создать песню</button>
+                    <span style="color: var(--gold); font-size: 0.85rem;">🔥 Сейчас: 69 ₽ вместо 199 ₽</span>
+                </div>
+                <div class="quick-tags">
+                    <div class="tag" onclick="setPrompt('Весёлая песня на день рождения для друга, много веселья и поздравлений')">День рождения</div>
+                    <div class="tag" onclick="setPrompt('Тёплая трогательная песня для мамы, спасибо за заботу')">Маме</div>
+                    <div class="tag" onclick="setPrompt('Романтичная песня для любимого человека, нежная и душевная')">Любимому</div>
+                    <div class="tag" onclick="setPrompt('Сказочная детская песня про динозавров, весёлая и добрая')">Ребёнку</div>
+                    <div class="tag" onclick="setPrompt('Праздничная песня для свадьбы, счастливая и торжественная')">Свадьба</div>
+                </div>
+            </div>
+
+            <!-- Результат генерации -->
+            <div class="result-panel" id="result-panel">
+                <h3 class="result-title">Ваш трек готов! 🎧</h3>
+                <p class="result-prompt" id="result-prompt"></p>
+                <audio id="audio-player" controls class="result-audio"></audio>
+                <button class="btn-download" id="download-btn" onclick="downloadTrack()">⬇ Скачать трек</button>
+                <p class="download-note">Файл в формате WAV скачается на ваш компьютер автоматически</p>
+            </div>
+        </header>
+
+        <!-- ===== Тарифы ===== -->
+        <section class="pricing-section">
+            <div class="section-title"><h2>🔥 Выгодные предложения</h2></div>
+            <div class="pricing-grid">
+                <div class="price-card">
+                    <h3 class="plan-name">1 трек</h3>
+                    <span class="old-price">199 ₽</span>
+                    <div class="new-price">69 ₽</div>
+                    <span class="per">за генерацию · −65%</span>
+                    <button class="btn-buy" onclick="buyPlan('1 трек — 69 ₽')">Купить</button>
+                </div>
+                <div class="price-card featured">
+                    <span class="hot-badge">ХИТ ПРОДАЖ</span>
+                    <h3 class="plan-name">5 треков</h3>
+                    <span class="old-price">519 ₽</span>
+                    <div class="new-price">249 ₽</div>
+                    <span class="per">всего 49,80 ₽ за трек · −52%</span>
+                    <button class="btn-buy" onclick="buyPlan('5 треков — 249 ₽')">Купить</button>
+                </div>
+                <div class="price-card">
+                    <h3 class="plan-name">Подписка на месяц</h3>
+                    <span class="old-price">Обычная цена выше</span>
+                    <div class="new-price">55 ₽</div>
+                    <span class="per">в месяц · безлимит генераций</span>
+                    <button class="btn-buy green" onclick="buyPlan('Подписка — 55 ₽/мес')">Оформить</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Примеры ===== -->
+        <section class="examples-section">
+            <div class="section-title">
+                <h2>Послушайте, что создают пользователи</h2>
+            </div>
+            <div class="grid" id="examples-grid"></div>
+        </section>
+
+        <footer>
+            <p>© 2024 AI Music Lab. Демо-версия интерфейса.</p>
+        </footer>
+    </main>
+
+    <!-- ===== ХУК: поп-ап со скидками ===== -->
+    <div class="promo-overlay" id="promo-overlay">
+        <div class="promo-card">
+            <div class="promo-inner">
+                <div class="promo-fire">🔥</div>
+                <h2 class="promo-title">СКИДКИ НА СТАРТЕ!</h2>
+                <p class="promo-sub">Только для новых посетителей — цены сгорают по таймеру:</p>
+                <div class="promo-row">
+                    <span class="name">1 трек</span>
+                    <span><span class="old">199 ₽</span><span class="new">69 ₽</span><span class="save-badge">−65%</span></span>
+                </div>
+                <div class="promo-row">
+                    <span class="name">5 треков</span>
+                    <span><span class="old">519 ₽</span><span class="new">249 ₽</span><span class="save-badge">−52%</span></span>
+                </div>
+                <div class="promo-row">
+                    <span class="name">Подписка на месяц</span>
+                    <span><span class="new">55 ₽/мес</span><span class="save-badge">СТАРТ</span></span>
+                </div>
+                <div class="countdown" id="countdown">⏰ 23:59:59</div>
+                <div class="promo-actions">
+                    <button class="btn-grab" onclick="grabDiscount()">Забрать скидку</button>
+                    <button class="btn-later" onclick="closePromo()">Позже</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- ХЕДЕР -->
-    <header>
-        <div class="container">
-            <div class="logo">AI Music Lab</div>
-            <nav>
-                <a href="#how-it-works">Как это работает</a>
-                <a href="#pricing">Тарифы</a>
-                <a href="#examples">Примеры</a>
-            </nav>
-        </div>
-    </header>
-
-    <!-- ГЛАВНЫЙ ЭКРАН -->
-    <section id="hero">
-        <div class="container">
-            <h1>Создай свою музыку<br>с <span class="accent">ИИ</span></h1>
-            <p>Опиши настроение, жанр и инструменты — искусственный интеллект создаст трек специально для тебя.</p>
-
-            <form id="music-form">
-                <input type="text" id="prompt-input" placeholder="Например: меланхоличный лоу-фай бит с гитарой и саксофоном..." required>
-                <button type="submit" class="btn btn-primary"><span>Сгенерировать трек</span></button>
-
-                <div class="progress-container" id="progress-container">
-                    <div class="progress-bar" id="progress-bar"></div>
-                </div>
-                <p id="progress-label">Нейросеть анализирует запрос...</p>
-            </form>
-
-            <div id="result">
-                <h3>Ваш трек готов! 🎧</h3>
-                <p id="result-prompt" style="color:#888; font-size:0.9rem; margin-bottom: 20px;"></p>
-                <audio id="audio-player" controls></audio>
-                <button id="download-btn" class="btn btn-primary"><span>⬇ Скачать трек — 49 ₽</span></button>
-            </div>
-
-            <p class="note">⚡ Акция: обычная цена 139 ₽ — сейчас всего 49 ₽ за трек!</p>
-        </div>
-    </section>
-
-    <!-- КАК ЭТО РАБОТАЕТ -->
-    <section id="how-it-works">
-        <div class="container">
-            <h2 class="section-title fade-in">Как это работает</h2>
-            <div class="steps-grid">
-                <div class="step-card fade-in">
-                    <span class="step-icon">📝</span>
-                    <h3 class="step-title">Опиши идею</h3>
-                    <p class="step-desc">Введи промпт: жанр, настроение и инструменты. Чем детальнее описание, тем точнее результат.</p>
-                </div>
-                <div class="step-card fade-in">
-                    <span class="step-icon">🤖</span>
-                    <h3 class="step-title">ИИ генерирует</h3>
-                    <p class="step-desc">Алгоритм анализирует текст и создает уникальную мелодию, подбирая аккорды и ритм под запрос.</p>
-                </div>
-                <div class="step-card fade-in">
-                    <span class="step-icon">🎵</span>
-                    <h3 class="step-title">Скачай и слушай</h3>
-                    <p class="step-desc">Прослушай результат в плеере и скачай файл. Трек твой — используй где угодно!</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ТАРИФЫ -->
-    <section id="pricing">
-        <div class="container">
-            <h2 class="section-title fade-in">Тарифы</h2>
-            <div class="grid">
-                <div class="card fade-in">
-                    <span class="badge">Хит</span>
-                    <h3>1 трек</h3>
-                    <p><span class="price-old">139 ₽</span> &nbsp; <span class="price-new">49 ₽</span></p>
-                    <p class="card-desc">Генерация за 1 минуту, формат WAV.</p>
-                    <button class="btn btn-ghost" onclick="alert('Сгенерируйте трек через форму выше — оплата откроется после генерации!')"><span>Купить</span></button>
-                </div>
-                <div class="card fade-in">
-                    <h3>Пакет 5 треков</h3>
-                    <p><span class="price-old">695 ₽</span> &nbsp; <span class="price-new">220 ₽</span></p>
-                    <p class="card-desc">Скидка 68% + приоритетная очередь.</p>
-                    <button class="btn btn-ghost" onclick="alert('Здесь будет форма оплаты')"><span>Купить</span></button>
-                </div>
-                <div class="card fade-in">
-                    <h3>Безлимит (мес)</h3>
-                    <p><span class="price-old">2 490 ₽</span> &nbsp; <span class="price-new">490 ₽</span></p>
-                    <p class="card-desc">Неограниченные генерации в месяц.</p>
-                    <button class="btn btn-ghost" onclick="alert('Здесь будет форма оплаты')"><span>Купить</span></button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ПРИМЕРЫ -->
-    <section id="examples">
-        <div class="container">
-            <h2 class="section-title fade-in">Примеры сгенерированных треков</h2>
-            <div class="grid">
-                <div class="card fade-in">
-                    <div class="example-cover" style="background: linear-gradient(135deg, #ff0055, #ff5500);">Lo-Fi Vibes</div>
-                    <p>Расслабляющий бит для работы.</p>
-                </div>
-                <div class="card fade-in">
-                    <div class="example-cover" style="background: linear-gradient(135deg, #0000ff, #5500ff);">Cyberpunk Drive</div>
-                    <p>Энергичный синтвейв для дороги.</p>
-                </div>
-                <div class="card fade-in">
-                    <div class="example-cover" style="background: linear-gradient(135deg, #00ff88, #005533);">Piano Emotions</div>
-                    <p>Грустная фортепианная мелодия.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- МОДАЛКА ОПЛАТЫ -->
-    <div class="modal-overlay" id="pay-modal">
+    <!-- ===== Модалка генерации ===== -->
+    <div class="modal-overlay" id="modal">
         <div class="modal">
-            <button class="close" onclick="closeModal()">✕</button>
-            <div id="pay-offer">
-                <h3>Оформление трека</h3>
-                <p class="old">Обычная цена: 139 ₽</p>
-                <p class="new">49 ₽</p>
-                <span class="badge">−65% по акции сегодня</span>
-                <div class="pay-methods">
-                    <span>💳 Карта</span>
-                    <span>⚡ СБП</span>
-                    <span>📱 СБПэй</span>
-                </div>
-                <button id="pay-confirm" class="btn btn-primary"><span>Оплатить 49 ₽</span></button>
-                <p class="secure-note">🔒 Демо-режим: реальная оплата не списывается</p>
-            </div>
-            <div id="pay-success" style="display:none;">
-                <div style="font-size:3rem; margin-bottom: 10px;">✅</div>
-                <h3>Оплата прошла!</h3>
-                <p>Трек уже скачивается на ваше устройство.</p>
-                <p style="font-size:0.85rem; color:#666;">Чек отправлен на почту (демо)</p>
-                <button class="btn btn-ghost" style="margin-top:15px;" onclick="closeModal()"><span>Закрыть</span></button>
-            </div>
+            <h2 id="modal-title">Генерация трека</h2>
+            <p id="modal-desc" style="color: var(--text-muted); margin-top: 8px;">Нейросеть анализирует ваш запрос и подбирает мелодию, ритм и вокал.</p>
+            <div class="progress-bar-container"><div class="progress-fill" id="progress-fill"></div></div>
+            <p id="progress-text">0%</p>
         </div>
     </div>
-
-    <!-- FOOTER -->
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 AI Music Lab. Демо-проект для портфолио.</p>
-            <p style="font-size: 0.8rem;">Реальная генерация музыки требует серверов с GPU — данный проект демонстрирует интерфейс и логику оплаты.</p>
-        </div>
-    </footer>
 
     <script>
         // ===== ЭЛЕМЕНТЫ =====
-        const form = document.getElementById('music-form');
-        const progressContainer = document.getElementById('progress-container');
-        const progressBar = document.getElementById('progress-bar');
-        const progressLabel = document.getElementById('progress-label');
-        const result = document.getElementById('result');
+        const promptInput = document.getElementById('prompt-input');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDesc = document.getElementById('modal-desc');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const resultPanel = document.getElementById('result-panel');
         const resultPrompt = document.getElementById('result-prompt');
         const audioPlayer = document.getElementById('audio-player');
         const downloadBtn = document.getElementById('download-btn');
-        const payModal = document.getElementById('pay-modal');
-        const payOffer = document.getElementById('pay-offer');
-        const paySuccess = document.getElementById('pay-success');
-        const payConfirm = document.getElementById('pay-confirm');
-        const cursorGlow = document.getElementById('cursor-glow');
-        const parallax = document.getElementById('parallax');
+        const createBtn = document.getElementById('create-btn');
 
         let wavBlob = null;
 
-        // ===== КУРСОР-ОРЕОЛ =====
-        document.addEventListener('mousemove', (e) => {
-            cursorGlow.style.left = e.clientX + 'px';
-            cursorGlow.style.top = e.clientY + 'px';
-        });
+        // ===== ХУК: поп-ап при входе =====
+        setTimeout(() => {
+            document.getElementById('promo-overlay').classList.add('show');
+            startCountdown();
+        }, 1000);
 
-        // ===== ПАРАЛЛАКС СЕТКИ =====
-        document.addEventListener('mousemove', (e) => {
-            const x = (window.innerWidth / 2 - e.clientX) / 40;
-            const y = (window.innerHeight / 2 - e.clientY) / 40;
-            parallax.style.transform = `translate(${x}px, ${y}px)`;
-        });
+        function closePromo() {
+            document.getElementById('promo-overlay').classList.remove('show');
+        }
+        function grabDiscount() {
+            closePromo();
+            promptInput.focus();
+            launchConfetti();
+        }
 
-        // ===== ГЕНЕРАЦИЯ WAV (5 СЕКУНД МЕЛОДИИ) =====
+        // Таймер акции (24 часа, живёт в localStorage)
+        function startCountdown() {
+            const el = document.getElementById('countdown');
+            let deadline = localStorage.getItem('promoDeadline');
+            if (!deadline || Date.now() > Number(deadline)) {
+                deadline = Date.now() + 24 * 60 * 60 * 1000;
+                localStorage.setItem('promoDeadline', deadline);
+            }
+            setInterval(() => {
+                let diff = Math.max(0, Number(deadline) - Date.now());
+                const h = Math.floor(diff / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                el.textContent = '⏰ Акция сгорит через ' +
+                    String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+            }, 1000);
+        }
+
+        // ===== Конфетти =====
+        function launchConfetti() {
+            const emojis = ['🎉', '🔥', '🎵', '✨', '💸'];
+            for (let i = 0; i < 25; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.animationDelay = Math.random() * 1.5 + 's';
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 5000);
+            }
+        }
+
+        // ===== Кубик: случайный промпт =====
+        const ideas = [
+            'Меланхоличный лоу-фай бит с пианино и шумом дождя',
+            'Энергичный синтвейв про ночную дорогу и неоновые огни',
+            'Весёлая детская песня про кота, который учится играть на гитаре',
+            'Эпичный оркестровый саундтрек к фэнтези-фильму',
+            'Душевная песня под гитару о дружбе и первой любви',
+            'Агрессивный рок-трек с мощными барабанами',
+            'Расслабляющий эмбиент для медитации и сна',
+            'Танцевальный поп-хит про лето и море'
+        ];
+        function randomPrompt() {
+            promptInput.value = ideas[Math.floor(Math.random() * ideas.length)];
+        }
+
+        function setPrompt(text) { promptInput.value = text; }
+
+        // ===== ГЕНЕРАЦИЯ WAV (уникальный трек каждый раз) =====
         function generateWav(prompt) {
             const sampleRate = 22050;
-            const duration = 5;
-            const scale = (prompt.includes('груст') || prompt.includes('меланхол'))
-                ? [220, 262, 330, 392]   // минор
-                : [262, 330, 392, 523];  // мажор
+            const duration = 10;
             const numSamples = sampleRate * duration;
+
+            // --- заголовок WAV ---
             const buffer = new ArrayBuffer(44 + numSamples * 2);
             const view = new DataView(buffer);
-
             const writeStr = (offset, s) => {
                 for (let i = 0; i < s.length; i++) view.setUint8(offset + i, s.charCodeAt(i));
             };
@@ -482,76 +486,167 @@
             view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
             writeStr(36, 'data'); view.setUint32(40, numSamples * 2, true);
 
+            // --- каждый запуск — новая «вселенная» трека ---
+            const isSad = /груст|меланхол|печал|дожд|одинок/i.test(prompt);
+            const tempo = Math.round(isSad ? 70 + Math.random() * 25 : 95 + Math.random() * 45);
+            const beat = 60 / tempo;
+            const step = beat / 2;
+            const roots = isSad ? [220.0, 233.08, 246.94] : [261.63, 293.66, 329.63, 349.23];
+            const root = roots[Math.floor(Math.random() * roots.length)];
+            const progressions = isSad
+                ? [[[0,3,7],[3,7,10],[8,12,15],[5,8,12]], [[0,3,7,10],[5,8,12],[10,14,17],[7,10,14]]]
+                : [[[0,4,7],[5,9,12],[7,11,14],[9,12,16]], [[0,4,7],[7,11,14],[9,12,16],[5,9,12]]];
+            const prog = progressions[Math.floor(Math.random() * progressions.length)];
+            const waveTypes = ['sine', 'triangle', 'square'];
+            const leadWave = waveTypes[Math.floor(Math.random() * waveTypes.length)];
+            const chordDur = beat * 2;
+
+            const osc = (type, phase) => {
+                if (type === 'square') return Math.sign(Math.sin(phase)) * 0.5;
+                if (type === 'triangle') return 2 / Math.PI * Math.asin(Math.sin(phase));
+                return Math.sin(phase);
+            };
+
+            // --- паттерн мелодии с паузами ---
+            const totalSteps = Math.ceil(duration / step);
+            const melodyEvents = [];
+            for (let s = 0; s < totalSteps; s++) {
+                if (Math.random() < 0.65) {
+                    const chord = prog[Math.floor((s * step) / chordDur) % prog.length];
+                    const off = chord[Math.floor(Math.random() * chord.length)];
+                    const oct = 2 * (1 + Math.floor(Math.random() * 2));
+                    const freq = root * Math.pow(2, off / 12) * oct;
+                    const len = 1 + Math.floor(Math.random() * 3);
+                    melodyEvents.push({ start: s * step, freq, len: len * step });
+                }
+            }
+
+            // кик: сильные доли + случайно слабые
+            const kickSteps = [];
+            for (let s = 0; s < totalSteps; s += 2) {
+                if (s % 4 === 0 || Math.random() < 0.3) kickSteps.push(s);
+            }
+
+            // --- рендер ---
             let offset = 44;
             for (let i = 0; i < numSamples; i++) {
                 const t = i / sampleRate;
-                const noteIdx = Math.floor(t * 2) % scale.length;
-                const freq = scale[(noteIdx + prompt.length) % scale.length];
-                let sample = Math.sin(2 * Math.PI * freq * t) * 0.3;
-                sample += Math.sin(2 * Math.PI * freq * 2 * t) * 0.1;
+
+                const chordIdx = Math.floor(t / chordDur) % prog.length;
+                const bassFreq = root * Math.pow(2, prog[chordIdx][0] / 12) / 2;
+                let sample = Math.sin(2 * Math.PI * bassFreq * t) * 0.22;
+
+                for (const off of prog[chordIdx]) {
+                    sample += Math.sin(2 * Math.PI * root * Math.pow(2, off / 12) * t) * 0.05;
+                }
+
+                for (const ev of melodyEvents) {
+                    if (t >= ev.start && t < ev.start + ev.len) {
+                        const local = (t - ev.start) / ev.len;
+                        const env = Math.exp(-3 * local) * (1 - local * 0.2);
+                        sample += osc(leadWave, 2 * Math.PI * ev.freq * t) * 0.3 * env;
+                        break;
+                    }
+                }
+
+                for (const ks of kickSteps) {
+                    const tKick = t - ks * step;
+                    if (tKick >= 0 && tKick < 0.15) {
+                        sample += Math.sin(2 * Math.PI * (120 - 80 * tKick / 0.15) * tKick) * 0.5 * Math.exp(-25 * tKick);
+                        break;
+                    }
+                }
+
+                const stepIdx = Math.floor(t / step);
+                const tHat = t - stepIdx * step;
+                if (tHat < 0.03 && stepIdx % 2 === 1) {
+                    sample += (Math.random() * 2 - 1) * 0.08 * Math.exp(-80 * tHat);
+                }
+
                 const fade = Math.min(1, (duration - t) * 2);
-                view.setInt16(offset, sample * fade * 32767, true);
+                view.setInt16(offset, Math.max(-1, Math.min(1, sample)) * fade * 32767, true);
                 offset += 2;
             }
             return new Blob([buffer], { type: 'audio/wav' });
         }
 
-        // ===== ЛОГИКА ГЕНЕРАЦИИ =====
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const prompt = document.getElementById('prompt-input').value;
-            progressContainer.style.display = 'block';
-            progressLabel.style.display = 'block';
-            result.style.display = 'none';
-            downloadBtn.querySelector('span').textContent = '⬇ Скачать трек — 49 ₽';
+        // ===== Логика генерации =====
+        function startGeneration() {
+            const prompt = promptInput.value.trim();
+            if (!prompt) { alert('Опишите идею песни!'); return; }
 
-            let width = 0;
-            const interval = setInterval(() => {
-                if (width >= 100) {
-                    clearInterval(interval);
-                    progressLabel.style.display = 'none';
-                    wavBlob = generateWav(prompt);
-                    audioPlayer.src = URL.createObjectURL(wavBlob);
-                    resultPrompt.textContent = 'Запрос: «' + prompt + '»';
-                    result.style.display = 'block';
-                    progressContainer.style.display = 'none';
-                    progressBar.style.width = '0%';
+            createBtn.disabled = true;
+            resultPanel.classList.remove('show');
+            modal.style.display = 'flex';
+            modalTitle.textContent = 'Генерация трека';
+            modalDesc.textContent = 'Нейросеть анализирует ваш запрос и подбирает мелодию, ритм и вокал.';
+            progressFill.style.width = '0%';
+            progressText.textContent = '0%';
+
+            let p = 0;
+            const iv = setInterval(() => {
+                p += Math.random() * 12;
+                if (p >= 100) {
+                    p = 100;
+                    clearInterval(iv);
+                    progressFill.style.width = '100%';
+                    progressText.textContent = '100%';
+                    finishGeneration(prompt);
                 } else {
-                    width += Math.random() * 10;
-                    if (width > 100) width = 100;
-                    progressBar.style.width = width + '%';
+                    progressFill.style.width = p + '%';
+                    progressText.textContent = Math.floor(p) + '%';
                 }
-            }, 200);
-        });
+            }, 250);
+        }
 
-        // ===== ОПЛАТА =====
-        downloadBtn.addEventListener('click', () => {
-            payModal.classList.add('active');
-            payOffer.style.display = 'block';
-            paySuccess.style.display = 'none';
-        });
+        function finishGeneration(prompt) {
+            wavBlob = generateWav(prompt);
+            audioPlayer.src = URL.createObjectURL(wavBlob);
+            resultPrompt.textContent = 'Запрос: «' + prompt + '»';
+            modal.style.display = 'none';
+            resultPanel.classList.add('show');
+            createBtn.disabled = false;
+            downloadBtn.disabled = false;
+            downloadBtn.textContent = '⬇ Скачать трек';
+            resultPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
 
-        payConfirm.addEventListener('click', () => {
+        // ===== РЕАЛЬНОЕ СКАЧИВАНИЕ =====
+        function downloadTrack() {
             if (!wavBlob) return;
+            downloadBtn.disabled = true;
             const a = document.createElement('a');
             a.href = URL.createObjectURL(wavBlob);
-            a.download = 'ai-generated-track.wav';
+            a.download = 'ai-track-' + Date.now() + '.wav';
             a.click();
-            payOffer.style.display = 'none';
-            paySuccess.style.display = 'block';
-            downloadBtn.querySelector('span').textContent = '⬇ Скачано! Спасибо за покупку';
+            launchConfetti();
+            downloadBtn.textContent = '✅ Скачано! Проверьте папку «Загрузки»';
+            setTimeout(() => { downloadBtn.disabled = false; }, 2000);
+        }
+
+        // ===== Покупка тарифа (демо) =====
+        function buyPlan(name) {
+            launchConfetti();
+            alert('🎉 Отлично! Тариф «' + name + '» оформлен (демо-режим, деньги не списываются).');
+        }
+
+        // ===== Примеры треков =====
+        const examples = [
+            { title: 'Твой рубеж', artist: 'Дмитрий Фроленков', color: 'linear-gradient(135deg, #ff0055, #ff5500)' },
+            { title: 'С юбилеем, мама Люба', artist: 'Анна Семенова', color: 'linear-gradient(135deg, #7b2ff7, #4a00e0)' },
+            { title: 'Городские огни', artist: 'Urban Flow', color: 'linear-gradient(135deg, #00e5a0, #005533)' },
+            { title: 'Тихий вечер', artist: 'Lullaby Project', color: 'linear-gradient(135deg, #1e3c72, #2a5298)' }
+        ];
+        const grid = document.getElementById('examples-grid');
+        examples.forEach(t => {
+            const card = document.createElement('div');
+            card.className = 'track-card';
+            card.innerHTML =
+                '<div class="cover" style="background:' + t.color + '">▶</div>' +
+                '<div class="track-info"><h3>' + t.title + '</h3><p>' + t.artist + '</p></div>' +
+                '<button class="play-btn">Слушать</button>';
+            grid.appendChild(card);
         });
-
-        function closeModal() { payModal.classList.remove('active'); }
-        payModal.addEventListener('click', (e) => { if (e.target === payModal) closeModal(); });
-
-        // ===== ПОЯВЛЕНИЕ БЛОКОВ ПРИ СКРОЛЛЕ =====
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('visible');
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
     </script>
 </body>
 </html>
